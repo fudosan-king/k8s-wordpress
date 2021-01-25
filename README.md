@@ -11,6 +11,8 @@ minikube config set driver virtualbox
 minikube start
 # Take the image previously built on docker:
 eval $(minikube docker-env)
+# Build docker
+docker build -t wordpress-php8:latest .
 # Enable the NGINX Ingress controller:
 minikube addons enable ingress
 
@@ -40,5 +42,10 @@ minikube dashboard
 
 ## Port forward from host to a pod
 ```
-kubectl -n wp port-forward <pod_name> <port>:<target-port>
+kubectl -n wp port-forward <pod_name> <port>:<target-port> 
 ```
+
+## Database configuration
+> https://github.com/fudosan-king/k8s-wordpress/blob/master/k8s/secret.yml
+## Config wordpress volume hostpath
+> https://github.com/fudosan-king/k8s-wordpress/blob/master/k8s/wp/pv-volume.yml#L13
