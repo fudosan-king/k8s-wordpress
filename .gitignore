@@ -1,0 +1,5 @@
+config-local.yaml
+*.zip
+.env
+.DS_Store
+*_bak

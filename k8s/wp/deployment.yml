@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-deployment
+  labels:
+    app: wordpress
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      volumes:
+      - name: wordpress-storage
+        persistentVolumeClaim:
+          claimName: wordpress-pvc
+      - name: nginx-config-volume
+        configMap:
+          name: nginx-config
+      # securityContext:
+      #   runAsUser: 1000
+      #   runAsGroup: 1000
+      #   fsGroup: 1000
+      containers:
+      - name: wordpress
+        image: wordpress-php8:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 9000
+          name: fastcgi
+        volumeMounts:
+        - name: wordpress-storage
+          mountPath: /var/www/html
+        securityContext:
+          allowPrivilegeEscalation: false
+      - name: nginx
+        image: nginx:stable-alpine
+        imagePullPolicy: Always
+        env:
+        - name: NGINX_HOST
+          value: wpk8s.test
+        - name: NGINX_PORT
+          value: "80"
+        - name: NGINX_ROOT_DIR
+          value: /var/www/html
+        volumeMounts:
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/templates/wpk8s.conf.template
+          subPath: wpk8s.conf.template
+        - name: wordpress-storage
+          mountPath: /var/www/html
